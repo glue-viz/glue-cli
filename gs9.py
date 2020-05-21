@@ -2,7 +2,6 @@
 
 import click
 
-
 from matplotlib import cm
 
 from glue.config import colormaps
@@ -10,6 +9,7 @@ from glue.app.qt.application import GlueApplication
 from glue.viewers.image.qt import ImageViewer
 from glue.viewers.image.state import ImageLayerState
 
+from glue.main import load_plugins
 
 @click.command()
 @click.argument('data')
@@ -19,6 +19,8 @@ from glue.viewers.image.state import ImageLayerState
 @click.option('--stretch')
 @click.option('--cmap')
 def gs9(data, vmin, vmax, percentile, stretch, cmap):
+
+    load_plugins()
 
     if cmap is not None:
         for cmap_name, cmap_obj in colormaps.members:
