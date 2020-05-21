@@ -62,7 +62,7 @@ def gs9(data, vmin, vmax, percentile, stretch, cmap):
     image.viewer_size = (600, 600)
 
     ga.gather_current_tab()
-    ga.start(maximized=False, position=(100, 100), size=(1024, 768))
+    ga.start(maximized=False, size=(1024, 768))
 
 
 if __name__ == "__main__":
