@@ -8,11 +8,12 @@ from glue.config import colormaps
 from glue.app.qt.application import GlueApplication
 from glue.viewers.image.qt import ImageViewer
 from glue.viewers.image.state import ImageLayerState
+from glue.core.data_factories import load_data
 
 from glue.main import load_plugins
 
 @click.command()
-@click.argument('data')
+@click.argument('data', nargs=-1)
 @click.option('--vmin', type=float)
 @click.option('--vmax', type=float)
 @click.option('--percentile', type=float)
@@ -32,32 +33,40 @@ def gs9(data, vmin, vmax, percentile, stretch, cmap):
             cmap = cm.get_cmap(cmap)
 
     ga = GlueApplication()
-    d = ga.load_data(data)
 
     image = ga.new_data_viewer(ImageViewer)
-    image.add_data(d)
 
-    layer_state = image.state.layers[0]
+    datasets = []
+    for filename in data:
+        datasets.append(load_data(filename))
 
-    if vmin is not None:
-        layer_state.v_min = vmin
+    # Add datasets all in one go to do all linking in one pass
+    ga.add_datasets(datasets)
 
-    if vmax is not None:
-        layer_state.v_min = vmax
+    for d in ga.data_collection:
+        image.add_data(d)
 
-    if percentile is not None:
-        choices = ImageLayerState.percentile.get_choices(layer_state)
-        for choice in choices:
-            if percentile == choice:
-                percentile = choice
-                break
-        layer_state.percentile = percentile
+    for layer_state in image.state.layers:
 
-    if stretch is not None:
-        layer_state.stretch = stretch
+        if vmin is not None:
+            layer_state.v_min = vmin
 
-    if cmap is not None:
-        layer_state.cmap = cmap
+        if vmax is not None:
+            layer_state.v_min = vmax
+
+        if percentile is not None:
+            choices = ImageLayerState.percentile.get_choices(layer_state)
+            for choice in choices:
+                if percentile == choice:
+                    percentile = choice
+                    break
+            layer_state.percentile = percentile
+
+        if stretch is not None:
+            layer_state.stretch = stretch
+
+        if cmap is not None:
+            layer_state.cmap = cmap
 
     image.viewer_size = (600, 600)
 
